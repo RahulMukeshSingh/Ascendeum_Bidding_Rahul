@@ -1,0 +1,55 @@
+Part 1: Describe how you would build a logistic regression model to predict the probability of a bid winning (win) based on the other columns. What features would you select and why?
+Part 2: Based on the following results from a logistic regression model  trained on the dataset, interpret the coefficients:
+bid_amount: Coefficient = 0.8
+time_to_bid: Coefficient = -0.4
+ad_unit_A: Coefficient = 0.3 (reference category: ad_unit_B)
+
+-------------------------
+Part 1: Ans]
+Logistic Regression Steps:
+1. Binary Classes for Target Variable using Threshold.
+2. Removing irredundant columns based on domain knowledge and sparse data, Cleaning of data and Sanity Checks.
+3. Feature Engineering and Derived Metrics
+4. Select Features based on good correlations with target variable
+5. Train and Test Split based on 80:20 ratio and I will Stratify the split based on Target Class Imbalance.
+6. Preprocessing Pipelines: Categorical Columns: Impute and OneHotEncoding. Numerical Columns: Impute (median) and Standard Scaling.
+7. VIF (Variance Inflation Factor) check: To manually remove features till VIF <= 5 and based on Domain Knowledge to avoid multicolinearity.
+8. RFE (Recursive Feature Elimination) to reduce features to let's say to 10 features.
+9. After that, Logistic Model with regularization where L1: Lasso (to reduce features) and L2: Ridge (to reduce dominance)
+10. Apply transformation on test dataset as well and predict the values.
+11. Evaluate the prediction with ROC AUC Curve, Confusion Matrix, Precision and Recall.
+12. Evaluate the coefficient (Log Odds) to determine business decisions.
+
+Feature Selection:
+1. ad_unit: to understand which ad placement results to more bid wins.
+2. bid_range: Guess would be higher bid amount results to more bid wins.
+3. date_hour (Derived Column: Time and Date): which date or time, the bid win chances are more.
+4. sum_time_to_respond: This metric is crucial to avoid timeouts in bids. Assumption is faster respond leads to more bid wins.
+5. bidder: Is there any correlation between Bidder and Target Variable
+6. Win rate: Target Variable in Binary Classes.
+
+-------------------------
+Part 2: Ans]
+
+bid_amount: Coefficient = 0.8
+time_to_bid: Coefficient = -0.4
+ad_unit_A: Coefficient = 0.3 (reference category: ad_unit_B)
+
+
+Odd Ratio - bid_amount: 2.23
+Odd Ratio - time_to_bid: 0.67
+Odd Ratio - ad_unit_A: (reference category: ad_unit_B) 1.35
+
+If every features remain constant:
+2.1] Positive Correlation: With every more unit of bid amount, there is very high chances of winning a bid with log odds of 0.8 
+i.e. odds of winning increases (almost doubles) by 123%. ((exp(0.8) - 1) * 100 = 100* (2.23 - 1) = 123%)
+2.2] Negative Correlation: With every delay in time_to_bid, there is very low chances of winning a bid with log odds of -0.4
+i.e. odds of winning decreases by 33%. ((exp(-0.4) - 1) * 100 = 100* (0.67 - 1) = -33%)
+2.3] Positive Correlation: With every more add placement of Unit A compared to Unit B, 
+there is very high chances of winning a bid with log odds of 0.3 
+i.e. odds of winning increases by 35%. ((exp(0.3) - 1) * 100 = 100* (1.35 - 1) = 35%)
+
+Effect on Winning Bid (sorted from high influence to low):
+1. Bid Amount (+ve correlation)
+2. time_to_bid (-ve correlation)
+3. ad_unit_A compared to ad_unit_B (+ve correlation)
